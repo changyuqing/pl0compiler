@@ -15,7 +15,7 @@ public class FourCode {
     }
     public void print(){
         //todo
-        System.out.println(OP+"\t"+T1+"\t"+T2+"\t"+T3);
+        System.out.printf("%12s%12s%12s%12s\n",OP,T1,T2,T3);
     }
 
     public String getOP() {

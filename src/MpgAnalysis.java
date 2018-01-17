@@ -67,8 +67,11 @@ public class MpgAnalysis {
     public boolean mgpAnalysis() {
         lex.nextSym();
         block();
-        if(Errors.getNum() == 0)
+        if(Errors.getNum() == 0){
         fourCode.printAll();
+        System.out.println("符号表：");
+        STable.printTable();
+        }
         return Errors.getNum() != 0;
     }
 
@@ -123,17 +126,17 @@ public class MpgAnalysis {
                     if (lex.getSy() == intcon) {
                         fourCode.gen("CON", "-" + identvalue, "", identname);
                     } else {
-                        Errors.error(11);
+                        Errors.error(11);// 非法的常量值
                     }
                 } else if (lex.getSy() == plussy) {
                     identvalue = lex.nextSym();
                     if (lex.getSy() == intcon) {
                         fourCode.gen("CON", identvalue, "", identname);
                     } else {
-                        Errors.error(11);
+                        Errors.error(11);// 非法的常量值
                     }
                 } else {
-                    Errors.error(11);
+                    Errors.error(11);// 非法的常量值
                 }
             } else if (lex.getSy() == becomes) {
                 Errors.error(17);   //常量赋值符应该为等号

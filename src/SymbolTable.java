@@ -2,29 +2,18 @@
 public class SymbolTable {
 
     private int rowMax = 20;           //最大表长
-    private int valueMax = 100000;        //最大常量或变量值
-    private int levelMax = 10;                 //最深嵌套层次
-    private int addressMax = 10000;       //最大地址数
-
-
-    private int myconst = 1;                  //常量类型用1表示
-    private int var = 2;                      //变量类型用2表示
-    private int proc = 3;             //过程类型用3表示
 
     //TableRow是符号表中的每一行
     //tablePtr指向符号表中已经填入值最后一项的下一项
     //length表示符号表中填入；了多少行数据，实际上可以用tablePtr来表示
     private SymbolTableRow[] table = new SymbolTableRow[rowMax];          //rowMax行
-    private int[] display = new int[levelMax];
+
 
 
     private int tablePtr = 0;
-    private int length = 0;
 
 
-    public void setTablePtr(int tablePtr) {
-        this.tablePtr = tablePtr;
-    }
+
 
     //初始化，全部为0
     public SymbolTable() {
@@ -32,22 +21,13 @@ public class SymbolTable {
             table[i] = new SymbolTableRow("", 0, 0, 0, 0, 0, 0);
         }
     }
-
-    public int getVar() {
-        return var;
+    public void printTable(){
+        for (int i = 1; i <= tablePtr; i++) {
+            table[i].print();
+        }
     }
 
-    public int getMyconst() {
-        return myconst;
-    }
 
-    public int getProc() {
-        return proc;
-    }
-
-    public int getLength() {
-        return length;
-    }
 
     public boolean isFull() {
         return tablePtr == rowMax;
@@ -89,55 +69,11 @@ public class SymbolTable {
      */
 
 
-    //在lev层之前，包括lev层，名字为name的变量、常量、或过程是否被定义，
-    //使用变量、常量、或过程时调用该函数
-    public boolean isPreExistSTable(String name, int lev) {
-        for (int i = 0; i < length; i++) {
-            if (table[i].getName().equals(name) && table[i].getLevel() <= lev) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //在lev层，名字为name的变量、常量、或过程是否被定义，
-    //定义变量、常量、或过程时调用该函数
-    public boolean isNowExistSTable(String name, int lev) {
-        for (int i = 0; i < length; i++) {
-            if (table[i].getName().equals(name) && table[i].getLevel() == lev) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    //返回符号表中名字为name的行的行号
-    public int getNameRow(String name) {
-        for (int i = length - 1; i >= 0; i--) {
-            if (table[i].getName().equals(name)) {
-                return i;
-            }
-        }
-        return -1;          //返回-1表示不存在该名字
-    }
 
     public int getTablePtr() {
         return tablePtr;
     }
 
-    public SymbolTableRow[] getAllTable() {
-        return table;
-    }
 
-    //查找本层的过程在符号表中的位置
-    public int getLevelPorc(int level) {
-        for (int i = length - 1; i >= 0; i--) {
-            if (table[i].getType() == proc) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
 }

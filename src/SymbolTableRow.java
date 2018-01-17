@@ -22,6 +22,9 @@ public class SymbolTableRow {
         setAdr(adr);
 
     }
+    public void print(){
+        System.out.println(name+"   "+link+"   "+type+"   "+refer+"   "+level+"   "+ifvar+"   "+adr);
+    }
     public String getName() {
         return name;
     }

@@ -133,7 +133,9 @@ public class LexAnalysis {
                 sy = becomes;
                 getChar();
             } else {
-                Errors.error(60); // todo 缺少=
+                sy = becomes;
+                getChar();
+                Errors.error(12); // 赋值符应该有等号
             }
         } else if (ch == '<') { //小于，小于等于，不等于
             // Todo 没有判断<的情况
