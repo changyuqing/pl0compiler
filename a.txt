@@ -1,0 +1,18 @@
+const ca=1,cb=2;
+var a,b,c;
+begin
+	a := ca
+	if (a+0) = 1 then
+	begin
+		write( a)
+	end
+	else
+		write(ca);
+	c:=0;
+	while c<1 do
+	begin
+	    write(c)
+	    c:=c+1;
+	end
+
+end.
