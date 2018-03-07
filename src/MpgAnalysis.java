@@ -67,10 +67,11 @@ public class MpgAnalysis {
     public boolean mgpAnalysis() {
         lex.nextSym();
         block();
-        if(Errors.getNum() == 0){
-        fourCode.printAll();
-        System.out.println("符号表：");
-        STable.printTable();
+        if (Errors.getNum() == 0) {
+            System.out.println("四元式：");
+            fourCode.printAll();
+            System.out.println("符号表：");
+            STable.printTable();
         }
         return Errors.getNum() != 0;
     }
@@ -84,26 +85,26 @@ public class MpgAnalysis {
         if (lex.getSy() == varsy) {
             varDeclare();
         }
-        vartstring = fourCode.gen("VART", "0", "", "");   //生成临时变量声明的四元式
-        beginlabel = fourCode.gen("JMP", "", "", "begin");  //生成跳转至函数体的四元式
+        vartstring = fourCode.gen("VART", "-", "-", "0");   //生成临时变量声明的四元式
+        beginlabel = fourCode.gen("JMP", "-", "-", "begin");  //生成跳转至函数体的四元式
 
         while (lex.getSy() == procsy) {
             procDeclare();
         }
 
-        fourCode.gen("LABEL", "", "", beginlabel);    //
+        fourCode.gen("LABEL", "-", "-", beginlabel);    //
         if (lex.getSy() == beginsy) {
             compoundStatement();
         } else {
-            Errors.error(50);  //分程序必须有一个复合语句部分
+            Errors.error(25);  //分程序必须有一个复合语句部分
         }
-        fourCode.gen("VART", "1", vartstring, "");
+        fourCode.gen("VART", "-",  "-",vartstring);
 
         if (level == 0) {
             if (lex.getSy() == period) {
                 return;
             } else {
-                Errors.error(58);  //程序结尾缺少句号
+                Errors.error(29);  //程序结尾缺少句号
             }
         }
 
@@ -124,24 +125,24 @@ public class MpgAnalysis {
                 } else if (lex.getSy() == minussy) {
                     identvalue = lex.nextSym();
                     if (lex.getSy() == intcon) {
-                        fourCode.gen("CON", "-" + identvalue, "", identname);
+                        fourCode.gen("CON", "-" + identvalue, "-", identname);
                     } else {
-                        Errors.error(11);// 非法的常量值
+                        Errors.error(6);// 非法的常量值
                     }
                 } else if (lex.getSy() == plussy) {
                     identvalue = lex.nextSym();
                     if (lex.getSy() == intcon) {
-                        fourCode.gen("CON", identvalue, "", identname);
+                        fourCode.gen("CON", identvalue, "-", identname);
                     } else {
-                        Errors.error(11);// 非法的常量值
+                        Errors.error(6);// 非法的常量值
                     }
                 } else {
-                    Errors.error(11);// 非法的常量值
+                    Errors.error(6);// 非法的常量值
                 }
             } else if (lex.getSy() == becomes) {
-                Errors.error(17);   //常量赋值符应该为等号
+                Errors.error(9);   //常量赋值符应该为等号
             } else {
-                Errors.error(18);   //应该有等号为常量赋值
+                Errors.error(10);   //应该有等号为常量赋值
             }
             lex.nextSym();
             if (lex.getSy() == semicolon) {
@@ -149,13 +150,13 @@ public class MpgAnalysis {
             } else if (lex.getSy() == comma) {
                 identname = lex.nextSym();
             } else {
-                Errors.error(19);  //每个常量声明应该有逗号分隔
+                Errors.error(11);  //每个常量声明应该有逗号分隔
             }
         }
         if (lex.getSy() == semicolon) {
             lex.nextSym();
         } else {
-            Errors.error(20);  //常量声明结尾应该有分号
+            Errors.error(12);  //常量声明结尾应该有分号
         }
     }
 
@@ -167,20 +168,20 @@ public class MpgAnalysis {
         while (lex.getSy() == ident) {
 
             enterTable(identname, vartype);
-            fourCode.gen("VAR", "", "", identname);
+            fourCode.gen("VAR", "-", "-", identname);
             lex.nextSym();
             if (lex.getSy() == semicolon) {
                 break;
             } else if (lex.getSy() == comma) {
                 identname = lex.nextSym();
             } else {
-                Errors.error(19);  //每个常量声明应该有逗号分隔
+                Errors.error(30);  //每个变量声明应该有逗号分隔
             }
         }
         if (lex.getSy() == semicolon) {
             lex.nextSym();
         } else {
-            Errors.error(20);  //常量声明结尾应该有分号
+            Errors.error(31);  //变量声明结尾应该有分号
         }
     }
 
@@ -193,9 +194,9 @@ public class MpgAnalysis {
 
         procname = lex.nextSym();
         if (lex.getSy() != ident) {
-            Errors.error(30);  //没有过程名
+            Errors.error(14);  //没有过程名
         }
-        fourCode.gen("PRO", "", "", procname);
+        fourCode.gen("PRO", "-", "-", procname);
         enterTable(procname, proctype);
 
         prt = STable.getTablePtr();
@@ -203,19 +204,19 @@ public class MpgAnalysis {
 
         level += 1;             //level+1,进入下一层分程序，更改display区。
         if (level >= MaxLevel) {
-            Errors.error(34);  //嵌套层次过多
+            Errors.error(32);  //嵌套层次过多
         }
         if (BTable.isFull()) {
-            Errors.error(35);  //分程序表溢出
+            Errors.error(33);  //分程序表溢出
         }
-        BTable.enterTable(0, 0, 0, 0);
+        BTable.enterTable(0);
         display[level] = BTable.getTablePtr();
         STable.getRow(prt).setRefer(BTable.getTablePtr());
 
         if (lex.getSy() == semicolon) {
             lex.nextSym();
         } else {
-            Errors.error(33);  //过程和函数声明结尾应有分号
+            Errors.error(15);  //过程声明结尾应有分号
         }
 
         block();                //进入下一层分程序
@@ -223,27 +224,27 @@ public class MpgAnalysis {
         if (lex.getSy() == semicolon) {
             lex.nextSym();
         } else
-            Errors.error(36);  //每个分程序结束应有分号
+            Errors.error(34);  //每个分程序结束应有分号
     }//procdeclare end
 
     public void enterTable(String name, int type) {
         int i, link;
         if (STable.isFull()) {
-            Errors.error(8);    //符号表溢出
+            Errors.error(3);    //符号表溢出
 
         } else {
             STable.getRow(0).setName(name);
-            i = link = BTable.getRow(display[level]).getLast();
+            i = link = BTable.getRow(display[level]);
 
             while (!STable.getRow(i).getName().equals(name)) {
                 i = STable.getRow(i).getLink();
             }
             if (i != 0) {
-                Errors.error(9);   //标识符重定义
+                Errors.error(4);   //标识符重定义
             } else {
                 STable.enterTable(name, type, level, link);
             }
-            BTable.getRow(display[level]).setLast(STable.getTablePtr());
+            BTable.setRow(display[level], STable.getTablePtr());
         }
     }
 
@@ -253,14 +254,15 @@ public class MpgAnalysis {
         i = level;
         STable.getRow(0).setName(name);
         do {
-            j = BTable.getRow(display[i]).getLast();
+            j = BTable.getRow(display[i]);
             while (!STable.getRow(j).getName().equals(name) && j != 0) {
                 j = STable.getRow(j).getLink();
             }
             i--;
         } while (i >= 0 && j == 0);
         if (j == 0) {
-            Errors.error(10); //未定义的标识符
+            LexAnalysis.isNewLine=0;
+            Errors.error(5); //未定义的标识符
         }
         return j;
     }//locate end
@@ -273,16 +275,13 @@ public class MpgAnalysis {
         if (lex.getSy() == ident) {
             i = locate(lex.getStrToken());
             first = lex.getStrToken();
-//            if(tab[i].obj == proctype){
-//                nextsym();
-//                call(tab[i].refer, first);
-//            }
-            if (STable.getRow(i).getType() == vartype) {
-                lex.nextSym();
-                assignmentStatement(first);
-            } else if (STable.getRow(i).getType() == consttype) {
-                Errors.error(51);    //常量不能被赋值
-            }
+             if (STable.getRow(i).getType() == consttype) {
+                Errors.error(26);    //常量不能被赋值
+            }else if (STable.getRow(i).getType() != proctype) {
+                     lex.nextSym();
+                     assignmentStatement(first);
+                 }
+
         } else if (lex.getSy() == beginsy)
             compoundStatement();
         else if (lex.getSy() == ifsy)
@@ -306,17 +305,17 @@ public class MpgAnalysis {
         if (lex.getSy() == thensy) {
             lex.nextSym();
         } else
-            Errors.error(42);   //缺少then
+            Errors.error(35);   //缺少then
         statement();
 
         if (lex.getSy() == elsesy) {
-            label2 = fourCode.gen("JMP", "", "", "else");
-            fourCode.gen("LABEL", "", "", label1);
+            label2 = fourCode.gen("JMP", "-", "-", "else");
+            fourCode.gen("LABEL", "-", "-", label1);
             lex.nextSym();
             statement();
-            fourCode.gen("LABEL", "", "", label2);
+            fourCode.gen("LABEL", "-", "-", label2);
         } else {
-            fourCode.gen("LABEL", "", "", label1);
+            fourCode.gen("LABEL", "-", "-", label1);
         }
     }
 
@@ -328,7 +327,7 @@ public class MpgAnalysis {
         sy = lex.getSy();
         while (sy == semicolon || sy == beginsy || sy == ifsy || sy == whilesy) {
             if (sy != semicolon) {
-                Errors.error(40);  //复合语句中每条语句结尾应有分号
+                Errors.error(19);  //复合语句中每条语句结尾应有分号
             } else
                 lex.nextSym();
             statement();
@@ -337,7 +336,7 @@ public class MpgAnalysis {
         if (sy == endsy) {
             lex.nextSym();
         } else
-            Errors.error(41);  //缺少end
+            Errors.error(20);  //缺少end
     }
 
     private void assignmentStatement(String first)       //赋值语句处理
@@ -348,9 +347,9 @@ public class MpgAnalysis {
         if (lex.getSy() == becomes) {
             lex.nextSym();
             second = simpleExpression();
-            fourCode.gen("MOV", second, "", first);
+            fourCode.gen("MOV", second, "-", first);
         } else
-            Errors.error(39);  //缺少赋值符号
+            Errors.error(18);  //缺少赋值符号
 
     }
 
@@ -362,7 +361,7 @@ public class MpgAnalysis {
         if (sy == oddsy) {
             lex.nextSym();
             first = simpleExpression();
-            first = fourCode.gen("ODD", first, "", "if");
+            first = fourCode.gen("ODD", first, "-", "if");
         } else {
             first = simpleExpression();
             sy = lex.getSy();
@@ -382,7 +381,7 @@ public class MpgAnalysis {
                 }
                 lex.nextSym();
             } else {
-                Errors.error(39);  //非法的关系运算符
+                Errors.error(36);  //非法的关系运算符
             }
             second = simpleExpression();
             first = fourCode.gen(op, first, second, label);
@@ -426,6 +425,7 @@ public class MpgAnalysis {
         String first, second;
         sy = lex.getSy();
         first = factor();
+        sy = lex.getSy();
         while (sy == multi || sy == divsy) {
             op = sy;
             lex.nextSym();
@@ -435,6 +435,7 @@ public class MpgAnalysis {
             } else if (op == divsy) {
                 first = fourCode.gen("DIV", first, second, "#");
             }
+            sy = lex.getSy();
         }
         return first;
     }
@@ -454,7 +455,7 @@ public class MpgAnalysis {
                 first = lex.getStrToken();
                 lex.nextSym();
                 if (STable.getRow(i).getType() == proctype) {
-                    Errors.error(37); //过程不能参与运算
+                    Errors.error(16); //过程不能参与运算
                 }
             } else {
                 lex.nextSym();
@@ -466,7 +467,7 @@ public class MpgAnalysis {
                     Errors.error(16);  //缺右括号
             }
         } else {
-            Errors.error(38);  //非法的因子
+//            Errors.error(17);  //非法的因子
             lex.nextSym();
         }
         return first;
@@ -479,18 +480,18 @@ public class MpgAnalysis {
         String label1, label2;
         String op, calop;
 
-        label1 = fourCode.gen("LABEL", "", "", "while");
+        label1 = fourCode.gen("LABEL", "-", "-", "while");
         lex.nextSym();
         label2 = conditionExpression("while");
         if (lex.getSy() == dosy) {
             lex.nextSym();
             statement();
         } else {
-            Errors.error(46);//缺少do
+            Errors.error(21);//缺少do
         }
 
-        fourCode.gen("JMP", "", "", label1);
-        fourCode.gen("LABEL", "", "", label2);
+        fourCode.gen("JMP", "-", "-", label1);
+        fourCode.gen("LABEL", "-", "-", label2);
 
     }
 
@@ -503,12 +504,12 @@ public class MpgAnalysis {
         if (lex.getSy() == ident) {
             i = locate(lex.getStrToken());
             if (STable.getRow(i).getType() != proctype) {
-                Errors.error(56);  //Call中实参必须是分程序
+                Errors.error(28);  //Call中实参必须是分程序
             }
-            fourCode.gen("CALL", "", "", lex.getStrToken());
+            fourCode.gen("CALL", "-", "-", lex.getStrToken());
             lex.nextSym();
         } else
-            Errors.error(48);  //应该是一个标识符
+            Errors.error(23);  //应该是一个标识符
     }
 
     private void readProc()        //read处理
@@ -519,32 +520,32 @@ public class MpgAnalysis {
         if (lex.getSy() == lparent) {
             lex.nextSym();
         } else
-            Errors.error(47);  //缺少左括号
+            Errors.error(22);  //缺少左括号
         if (lex.getSy() == ident) {
             i = locate(lex.getStrToken());
             if (STable.getRow(i).getType() != vartype) {
-                Errors.error(55);  //read语句中实参必须是变量
+                Errors.error(27);  //read语句中实参必须是变量
             }
-            fourCode.gen("READ", "", "", lex.getStrToken());
+            fourCode.gen("READ", "-", "-", lex.getStrToken());
             lex.nextSym();
         } else
-            Errors.error(48);  //应该是一个标识符
+            Errors.error(23);  //应该是一个标识符
         while (lex.getSy() == comma) {
             String temp = lex.nextSym();
             i = locate(temp);
             if (lex.getSy() == ident) {
                 if (STable.getRow(i).getType() != vartype) {
-                    Errors.error(55);
+                    Errors.error(27);
                 }
-                fourCode.gen("READ", "", "", temp);
+                fourCode.gen("READ", "-", "-", temp);
                 lex.nextSym();
             } else
-                Errors.error(48);  //应该是一个标识符
+                Errors.error(23);  //应该是一个标识符
         }
         if (lex.getSy() == rparent) {
             lex.nextSym();
         } else
-            Errors.error(16);  //缺少右括号
+            Errors.error(8);  //缺少右括号
     }
 
     private void writeproc()        //write处理
@@ -554,19 +555,19 @@ public class MpgAnalysis {
         if (lex.getSy() == lparent) {
             lex.nextSym();
         } else
-            Errors.error(47);  //缺少左括号
+            Errors.error(22);  //缺少左括号
 
         first = simpleExpression();
-        fourCode.gen("WRITE", "", "", first);
+        fourCode.gen("WRITE", "-", "-", first);
         while (lex.getSy() == comma) {
             lex.nextSym();
             first = simpleExpression();
-            fourCode.gen("WRITE", "", "", first);
+            fourCode.gen("WRITE", "-", "-", first);
             lex.nextSym();
         }
         if (lex.getSy() == rparent) {
             lex.nextSym();
         } else
-            Errors.error(16);    //缺少右括号
+            Errors.error(8);    //缺少右括号
     }
 }

@@ -1,0 +1,22 @@
+const a = 19;
+var x, y, p, searchr;
+procedure testcase;
+	var rc,ri;
+	begin
+		read(rc);
+		ri := 10;
+		if rc=2 then
+		 begin ri:=ri-1;end
+		else
+		     ri:=ri+1;
+	end;
+begin
+	y := 0;
+	call testcase;
+    write(y);
+    p:=10;
+	while p>=0 do
+		p:=p-1;
+	write(y);
+	x := 0
+end.

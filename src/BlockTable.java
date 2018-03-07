@@ -1,24 +1,25 @@
 public class BlockTable {
     private int rowMax = 20;           //最大表长
-    private BlockTableRow[] table = new BlockTableRow[rowMax];
+    private int[] table = new int[rowMax];
     private int tablePtr = 0;
 
     public BlockTable() {
         for (int i = 0; i < rowMax; i++) {
-            table[i] = new BlockTableRow(0, 0, 0, 0);
+            table[i] = 0;
         }
     }
 
-    public void enterTable(int last, int lastpar, int psize, int vsize) {
+    public void enterTable(int last) {
         tablePtr++;
-        table[tablePtr].setLast(last);
-        table[tablePtr].setLastpar(lastpar);
-        table[tablePtr].setPsize(psize);
-        table[tablePtr].setVsize(vsize);
+        table[tablePtr] = last;
     }
 
-    public BlockTableRow getRow(int i) {
+    public int getRow(int i) {
         return table[i];
+    }
+
+    public void setRow(int i, int last) {
+        table[i] = last;
     }
 
     public int getTablePtr() {
@@ -28,6 +29,4 @@ public class BlockTable {
     public boolean isFull() {
         return tablePtr == rowMax;
     }
-
-
 }

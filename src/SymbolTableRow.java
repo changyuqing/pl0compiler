@@ -4,26 +4,21 @@ public class SymbolTableRow {
     private int link ;              //同一个分程序中的上一个标识符
 
     private int type ;              //标志符基本类型
-    private int refer ;             //数组、过程函数标识符指向的atab、btab
+    private int refer ;             //过程标识符指向的btab
     private int level ;             //标识符所属分程序层次
-    private int ifvar ;             //如果是参数，是否是变量形参
-    private int adr ;               //标识符在分程序运行栈的偏移量
 
     public SymbolTableRow(){
 
     }
-    public SymbolTableRow(String name, int link, int type, int refer, int level, int ifvar, int adr){
+    public SymbolTableRow(String name, int link, int type, int refer, int level){
         setName(name);
         setLink(link);
         setType(type);
         setRefer(refer);
         setLevel(level);
-        setIfvar(ifvar);
-        setAdr(adr);
-
     }
     public void print(){
-        System.out.println(name+"   "+link+"   "+type+"   "+refer+"   "+level+"   "+ifvar+"   "+adr);
+        System.out.printf("%8s%8s%8s%8s%8s\n",name,link,type,refer,level);
     }
     public String getName() {
         return name;
@@ -65,19 +60,4 @@ public class SymbolTableRow {
         this.level = level;
     }
 
-    public int getIfvar() {
-        return ifvar;
-    }
-
-    public void setIfvar(int ifvar) {
-        this.ifvar = ifvar;
-    }
-
-    public int getAdr() {
-        return adr;
-    }
-
-    public void setAdr(int adr) {
-        this.adr = adr;
-    }
 }

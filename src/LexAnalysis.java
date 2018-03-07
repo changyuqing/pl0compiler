@@ -1,59 +1,12 @@
 import java.io.*;
 
 public class LexAnalysis {
-    private static int nul = 0;
-    //变量申明符
-    private static int intcon = 1;
-    //运算符
-    private static int minussy = 2;
-    private static int plussy = 3;
-    private static int multi = 4;
-    private static int divsy = 5;
-    //关系运算符
-    private static int eql = 6;
-    private static int neq = 7;
-    private static int gtr = 8;
-    private static int geq = 9;
-    private static int lss = 10;
-    private static int leq = 11;
-    //括号
-    private static int lparent = 12;
-    private static int rparent = 13;
-    //标点符号
-    private static int comma = 14;
-    private static int semicolon = 15;
-    private static int period = 16;
-    private static int colon = 17;
-    private static int becomes = 18;
-    //各类声明符号和标识符
-    private static int constsy = 19;
-    private static int varsy = 20;
-    private static int procsy = 21;
-    private static int ident = 22;
-    //语句起始符号
-    private static int beginsy = 23;
-    private static int ifsy = 24;
-    private static int whilesy = 25;
-    private static int callsy = 26;
-    private static int readsy = 27;
-    private static int writesy = 28;
-    private static int oddsy = 29;
-    //其他
-    private static int endsy = 30;
-    private static int elsesy = 31;
-    private static int dosy = 32;
-    private static int thensy = 33;
 
-
-    private static int consttype = 34;
-    private static int vartype = 35;
-    private static int proctype = 36;
 
     private CharTable charTable = new CharTable();
     private String[] symTable = charTable.getSymTable();
-    private int symLength = symTable.length;
+
     private String[] constTable = charTable.getConstTable();
-    private int conLength = constTable.length;
 
     private char ch = ' ';
     private int sy = 0;
@@ -62,13 +15,13 @@ public class LexAnalysis {
     private char[] buffer;
     private int searchPtr = 0;
     private static int line = 1;
-    private static int isNewLine = 0;
+    static int isNewLine = 0;
 
     public LexAnalysis(String _filename) {
-        for (int i = 0; i < symLength; i++) {
+        for (int i = 0; i < symTable.length; i++) {
             symTable[i] = null;
         }
-        for (int j = 0; j < conLength; j++) {
+        for (int j = 0; j < constTable.length; j++) {
             constTable[j] = null;
         }
         filename = _filename;
@@ -82,7 +35,6 @@ public class LexAnalysis {
         File file = new File(filename);
         BufferedReader bf = null;
         try {
-            //   System.out.println("read file test.txt...");
             bf = new BufferedReader(new FileReader(file));
             String temp1 = "", temp2 = "";
             while ((temp1 = bf.readLine()) != null) {
@@ -92,11 +44,9 @@ public class LexAnalysis {
             buffer = temp2.toCharArray();
             bf.close();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.out.println("文件不存在");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.out.println("文件无法打开");
         }
     }
 
@@ -104,6 +54,7 @@ public class LexAnalysis {
         isNewLine = 0;
         strToken = "";
         getBC();//去除空格符
+        int nul = 0;
         if (isLetter()) { //读取一个标识符或关键字
             do {
                 concat();
@@ -113,9 +64,10 @@ public class LexAnalysis {
                 sy = charTable.isKeyWord(strToken);
             } else {
                 sy = nul;
-                Errors.error(1);  //标识符过长
+                Errors.error(0);  //标识符过长
             }
         } else if (isDigit()) {  //读取一个整数
+            int intcon = 1;
             sy = intcon;
             do {
                 concat();
@@ -123,11 +75,12 @@ public class LexAnalysis {
             } while (isDigit());
             if (strToken.length() > 9) {
                 sy = nul;
-                Errors.error(2);  //整数过长
+                Errors.error(1);  //整数过长
             }
         } else if (ch == ':') { //读取一个赋值符或冒号
             concat();
             getChar();
+            int becomes = 18;
             if (ch == '=') {
                 concat();
                 sy = becomes;
@@ -135,36 +88,41 @@ public class LexAnalysis {
             } else {
                 sy = becomes;
                 getChar();
-                Errors.error(12); // 赋值符应该有等号
+                Errors.error(7); // 赋值符应该有等号
             }
-        } else if (ch == '<') { //小于，小于等于，不等于
-            // Todo 没有判断<的情况
+        } else if (ch == '<') { //小于，小于等于
             concat();
             getChar();
+            int lss = 10;
             if (ch == '=') {
                 concat();
+                int leq = 11;
                 sy = leq;
                 getChar();
             } else sy = lss;
         } else if (ch == '#') { //不等于
             concat();
+            int neq = 7;
             sy = neq;
             getChar();
         } else if (ch == '>') { //大于，大于等于
             getChar();
+            int gtr = 8;
             if (ch == '=') {
                 concat();
+                int geq = 9;
                 sy = geq;
                 getChar();
             } else sy = gtr;
         } else if (ch == '.') { //句点，结束符
             concat();
+            int period = 16;
             sy = period;
         } else {                   //读取其他合法字符：'+','-','*','/','(',')','[',']','=',',',':',';'
             concat();
             sy = charTable.isPunctuationMark(ch + "");
             if (sy == nul) {
-                Errors.error(7);      //一个非法字符
+                Errors.error(2);      //一个非法字符
             }
             getChar();
         }
@@ -176,10 +134,8 @@ public class LexAnalysis {
             ch = buffer[searchPtr];
             searchPtr++;
         }
-//	System.out.print(ch);
         return ch;
     }
-
 
     public void getBC() {
         while ((ch == ' ' || ch == '	' || ch == '\n') && (searchPtr < buffer.length)) {
@@ -191,43 +147,31 @@ public class LexAnalysis {
         }
     }
 
-    public String concat() {
+    public void concat() {
         strToken = strToken + String.valueOf(ch);
-        return strToken;
     }
 
-    // todo 把isletter还原成原始函数
     public boolean isLetter() {
-        if (Character.isLetter(ch)) {
-            return true;
-        }
-        return false;
+        return Character.isLetter(ch);
     }
 
     public boolean isDigit() {
-        if (Character.isDigit(ch)) {
-            return true;
-        }
-        return false;
+        return Character.isDigit(ch);
     }
 
     public String getStrToken() {
         return strToken;
     }
 
-
-
     public void showError() {
         System.out.println();
         System.out.print("ERROR: cannot recognize the word in line " + line);
         System.out.println();
-
-
-    }
-    public static int getLine(){
-        return line-isNewLine;
     }
 
+    public static int getLine() {
+        return line - isNewLine;
+    }
 
     public int getSy() {
         return sy;

@@ -1,21 +1,22 @@
 public class FourCode {
-    private  String OP;
+    private String OP;
     private String T1;
     private String T2;
     private String T3;
 
-    public FourCode(){
+    public FourCode() {
 
     }
-    public FourCode(String op,String t1,String t2,String t3){
+
+    public FourCode(String op, String t1, String t2, String t3) {
         OP = op;
-        T1=t1;
+        T1 = t1;
         T2 = t2;
         T3 = t3;
     }
-    public void print(){
-        //todo
-        System.out.printf("%12s%12s%12s%12s\n",OP,T1,T2,T3);
+
+    public void print() {
+        System.out.printf("%12s%12s%12s%12s\n", OP, T1, T2, T3);
     }
 
     public String getOP() {
